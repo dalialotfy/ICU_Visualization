@@ -1,0 +1,9 @@
+{
+  "webpackServerPort": 19006,
+  "expoServerPort": 19000,
+  "devToolsPort": 19002,
+  "packagerPort": 19000,
+  "expoServerNgrokUrl": "https://xk-mz8.anonymous.icu-visualisation.exp.direct",
+  "packagerNgrokUrl": "https://packager.xk-mz8.anonymous.icu-visualisation.exp.direct",
+  "ngrokPid": 5580
+}
