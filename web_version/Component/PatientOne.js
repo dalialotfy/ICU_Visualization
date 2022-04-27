@@ -18,43 +18,31 @@ export default function PatientOne() {
   let [showTemp, setShowTemp] = useState(false)
   let[status,showStatus]=useState(true)
   let[sec,setSec]= useState(0)
-
-
+  let [state,ToggleStatus]= useState([])
+  let [title,setTitle] = useState('Go to Pressure')
+  let [modetitle,setmodeTitle]=useState("ON")
 var label=[]
   for (let i=0;i<20;i++)
   {
     label.push(i)
   }
 
-  //Temperature Readings
-  async function getDataTemp()
+  
+//sensors Readings
+  async function get_pateintData()
   {
-    let response = await fetch("http://localhost:8090/temp")
+    let response = await fetch("http://localhost:8090/patient_data?ID=1")
     let json = await response.json()
-    setTemp_chart(json)
-    console.log(json)
-    console.log(response)
+    setPressure_chart(json.pressure)
+    setTemp_chart(json.temp)
+    console.log(temp_chart)
+    console.log(pressure_chart)
 
   }
+
   setInterval(() => {
     setSec(sec+=1)
-  }, 1000);
-  useEffect(()=>getDataTemp(),[sec])
-
-
-//Pressure Readings
-  async function getDataPress()
-  {
-    let response = await fetch("http://localhost:8090/pres")
-    let json = await response.json()
-    setPressure_chart(json)
-    console.log(json)
-
-  }
-  setInterval(() => {
-    setSec(sec+=1)
-  }, 1000);
-  useEffect(()=>getDataPress(),[sec])
+  }, 2000);
 
   let [swap,setSwap]=useState(temp_chart) //swap between temperature and pressure data visualization.
   function Togglepress() //to show pressure data chart
@@ -62,28 +50,57 @@ var label=[]
     setSwap(pressure_chart)
     setShowPress((prev)=>!prev)
     setShowTemp((prev)=>!prev)
+    ToggleStatus('OFF','ON')
+    setTitle('Go to Temperature')
   }
   function ToggleTemp()//to show temperature data chart
   {
     setSwap(temp_chart)
     setShowTemp((prev)=>!prev)
     setShowPress((prev)=>!prev)
+    ToggleStatus('ON','OFF')
+    setTitle('Go to Pressure')
+
   }
-  async function ToggleStatus()
+  async function getStatus()
   {
-    console.log(status)
-    showStatus((prev)=>!prev)
-    let response =await fetch('https://mywebsite.com/endpoint/', {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        firstParam: 'ON'
-      })
-    });
+    // console.log(state)
+    // showStatus((prev)=>!prev)
+
+
+    if ((modetitle =='ON' && title =='Go to Pressure') || (modetitle =='OFF' && title =='Go to Temperature'))
+    {
+      // setmodeTitle("OFF")
+      ToggleStatus(['OFF','ON'])
+      console.log(state)
+
+    }
+    else if (((modetitle =='OFF') && (title=='Go to Pressure')) || ((modetitle =='ON') && (title=='Go to Temperature')))
+    { 
+      // setmodeTitle("ON")   
+      ToggleStatus(['ON','OFF'])
+      console.log(state)
+    }
+    if(modetitle=='ON')
+    {
+      setmodeTitle("OFF")
+    }else if(modetitle=='OFF'){ setmodeTitle("ON")}
+    // let response =await fetch('http://localhost:8090/state', {
+    //   method: 'POST',
+    //   headers: {
+    //     Accept: 'application/json',
+    //     'Content-Type': 'application/json',
+    //   },
+    //   body: JSON.stringify({
+    //     temp: state[0],
+    //     pressure:state[1]
+    //   })
+    // });    
+
   }
+  
+  // useEffect(()=>get_pateintData(),[sec])
+
   return (
     <>
 <View style={styles.container}>
@@ -125,12 +142,12 @@ var label=[]
   />
 </View>
 <View style={styles.space}>
-{status&&<Button style={styles.button} title='ON' onPress={()=>ToggleStatus()}/>}
+{status&&<Button style={styles.button} title={modetitle} onPress={()=>getStatus()}/>}
 
-{status||<Button style={styles.button} title='OFF' onPress={()=>ToggleStatus()}/>}</View>
+{status||<Button style={styles.button} title={modetitle} onPress={()=>getStatus()}/>}</View>
 <View style={styles.space}>
-{showPress&&<Button style={styles.button} title='Go to Pressure' onPress={()=>Togglepress()}/>}
-{showTemp&&<Button style={styles.button} title='Go to Temperature' onPress={()=>ToggleTemp()}/>}</View>
+{showPress&&<Button style={styles.button} title={title} onPress={()=>Togglepress()}/>}
+{showTemp&&<Button style={styles.button} title={title} onPress={()=>ToggleTemp()}/>}</View>
   <Text style={{textAlign:"center"}}>{new Date().toLocaleTimeString()} </Text>
 </>
 
