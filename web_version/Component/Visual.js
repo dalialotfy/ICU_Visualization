@@ -6,8 +6,18 @@ import { ImageBackground } from 'react-native';
 const img = {uri:"voice.jpg"}
 export default function Visual(props) {
 
+function test()
+{
+  let l=[]
+  let arr =['14,23,33,44']
+  arr.map((item)=>console.log(item.split(",")))
+  
+ 
+}
+test()
        
   return (
+
       <>
     <ImageBackground  source={require('../assets/icu2.png')} resizeMode='cover'  style={styles.image}>
 

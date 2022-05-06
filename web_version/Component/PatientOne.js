@@ -12,53 +12,96 @@ import {
  import {Dimensions} from 'react-native'
 const screenWidth = Dimensions.get("window").width*0.8
 export default function PatientOne() {
-  let [temp_chart,setTemp_chart]=useState([1,2,3,4,5]);
-  let [pressure_chart,setPressure_chart]=useState([5,4,3,2,1]);
+  let [temp_chart,setTemp_chart]=useState([1,2,2,2,2]);
+  let [pressure_chart,setPressure_chart]=useState([3,3,3,3,3]);
   let [showPress, setShowPress] = useState(true)
   let [showTemp, setShowTemp] = useState(false)
   let[status,showStatus]=useState(true)
   let[sec,setSec]= useState(0)
-  let [state,ToggleStatus]= useState([])
-  let [title,setTitle] = useState('Go to Pressure')
-  let [modetitle,setmodeTitle]=useState("ON")
+  let [state,ToggleStatus]= useState(["OFF","ON"])
+  let [title,setTitle] = useState('Go to Temperature')
+  let [modetitle,setmodeTitle]=useState("OFF")
 var label=[]
-  for (let i=0;i<20;i++)
+  for (let i=0;i<10;i++)
   {
     label.push(i)
   }
 
   
 //sensors Readings
-  async function get_pateintData()
+  async function get_pateintTemp()
   {
-    let response = await fetch("http://localhost:8090/patient_data?ID=1")
+    let response = await fetch("http://localhost:8090/patient_data?ID=1&reading=temp")
     let json = await response.json()
-    setPressure_chart(json.pressure)
-    setTemp_chart(json.temp)
+    let TempNum = json.temp
+    TempNum.forEach((item)=> setTemp_chart(item.split(",")))
+    setSwap(temp_chart)
     console.log(temp_chart)
+    // setTemp_chart(json.temp[0])
+   
+    // let tempNum= json.temp[0]
+    // console.log(tempNum)
+    // let temp =[]
+    // for (let i=0;i<12;i+=3)
+    // {
+    //   temp.push(tempNum[i])
+    // }
+    // console.log(temp_chart)
+    //   setTemp_chart(temp)
+     
+    // setSwap(temp_chart)
+    //   console.log(temp_chart)
+  
+  }
+  async function get_pateintpress()
+  {
+    let response = await fetch("http://localhost:8090/patient_data?ID=1&reading=pressure")
+    let json = await response.json()
+    let pressNum = json.pressure
+    let arrREs= pressNum.forEach((item)=> setPressure_chart( item.split(",")))
     console.log(pressure_chart)
+    setSwap(pressure_chart)
+    // let presNum= json.pressure[0]
 
+    // console.log(json.pressure)
+    // let pressure =[]
+    // for (let i=0;i<8;i+=2)
+    // {
+    //   pressure.push(presNum[i])
+    // }
+    //   setPressure_chart(pressure)
+      // setSwap(pressure_chart)
+    //   console.log(pressure_chart)
+    //   console.log(pressure)
   }
 
   setInterval(() => {
     setSec(sec+=1)
   }, 2000);
 
-  let [swap,setSwap]=useState(temp_chart) //swap between temperature and pressure data visualization.
+  let [swap,setSwap]=useState(pressure_chart) //swap between temperature and pressure data visualization.
   function Togglepress() //to show pressure data chart
   {
+    console.log("togPre")
+
     setSwap(pressure_chart)
+    console.log(pressure_chart)
     setShowPress((prev)=>!prev)
     setShowTemp((prev)=>!prev)
     ToggleStatus('OFF','ON')
+    console.log(state)
     setTitle('Go to Temperature')
   }
   function ToggleTemp()//to show temperature data chart
   {
+    console.log("togTe")
+
     setSwap(temp_chart)
+    console.log(temp_chart)
     setShowTemp((prev)=>!prev)
     setShowPress((prev)=>!prev)
     ToggleStatus('ON','OFF')
+    console.log(state)
     setTitle('Go to Pressure')
 
   }
@@ -73,18 +116,51 @@ var label=[]
       // setmodeTitle("OFF")
       ToggleStatus(['OFF','ON'])
       console.log(state)
-
+      // let new_chart=[]
+      // for (let i=0;i<20;i++){
+      // new_chart.push(0)
+      // }
+      // setTemp_chart(new_chart)
     }
     else if (((modetitle =='OFF') && (title=='Go to Pressure')) || ((modetitle =='ON') && (title=='Go to Temperature')))
     { 
       // setmodeTitle("ON")   
       ToggleStatus(['ON','OFF'])
+      // let new_chart=[]
+      // for (let i=0;i<20;i++){
+      // new_chart.push(0)
+      // }
+      // setPressure_chart(new_chart)
       console.log(state)
     }
     if(modetitle=='ON')
     {
       setmodeTitle("OFF")
-    }else if(modetitle=='OFF'){ setmodeTitle("ON")}
+    }else if(modetitle=='OFF'){ 
+      showStatus((prev)=>!prev)
+      // let new_chart=[]
+      // for (let i=0;i<20;i++){
+      // new_chart.push(0)
+      // }
+      // setPressure_chart(new_chart)
+      // setTemp_chart(new_chart)
+      setmodeTitle("ON")}
+    if (modetitle=="OFF" && title=='Go to Pressure')
+    {
+      let new_chart=[]
+      for (let i=0;i<20;i++){
+      new_chart.push(0)
+      }
+      
+      setTemp_chart(new_chart)
+    } if (modetitle=="OFF" && title=='Go to Temperature')
+    {
+      let new_chart=[]
+      for (let i=0;i<20;i++){
+      new_chart.push(0)
+      }
+      
+      setPressure_chart(new_chart)}
     // let response =await fetch('http://localhost:8090/state', {
     //   method: 'POST',
     //   headers: {
@@ -98,8 +174,26 @@ var label=[]
     // });    
 
   }
+  function switch_(){
+    if (title=='Go to Temperature')
+    {
+       get_pateintpress()
+    }else if (title=='Go to Pressure')
+    {
+      get_pateintTemp()
+    }
+  }
   
-  // useEffect(()=>get_pateintData(),[sec])
+  useEffect(()=>
+    // if(!status)
+    // {
+    //   return
+    // }
+    switch_(),[sec])
+
+  
+  
+
 
   return (
     <>
@@ -146,8 +240,8 @@ var label=[]
 
 {status||<Button style={styles.button} title={modetitle} onPress={()=>getStatus()}/>}</View>
 <View style={styles.space}>
-{showPress&&<Button style={styles.button} title={title} onPress={()=>Togglepress()}/>}
-{showTemp&&<Button style={styles.button} title={title} onPress={()=>ToggleTemp()}/>}</View>
+{showPress&&<Button style={styles.button} title={title} onPress={()=>ToggleTemp()}/>}
+{showTemp&&<Button style={styles.button} title={title} onPress={()=>Togglepress()}/>}</View>
   <Text style={{textAlign:"center"}}>{new Date().toLocaleTimeString()} </Text>
 </>
 
