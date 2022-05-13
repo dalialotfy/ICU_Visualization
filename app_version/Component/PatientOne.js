@@ -18,11 +18,11 @@ export default function PatientOne() {
   let [showTemp, setShowTemp] = useState(false)
   let[status,showStatus]=useState(true)
   let[sec,setSec]= useState(0)
-  let [state,ToggleStatus]= useState(["OFF","ON"])
+  let [state,ToggleStatus]= useState(["ON","OFF"])
   let [title,setTitle] = useState('Go to Temperature')
   let [modetitle,setmodeTitle]=useState("OFF")
 var label=[]
-  for (let i=0;i<10;i++)
+  for (let i=0;i<50;i++)
   {
     label.push(i)
   }
@@ -31,11 +31,12 @@ var label=[]
 //sensors Readings
   async function get_pateintTemp()
   {
-    let response = await fetch("http://localhost:8090/patient_data?ID=1&reading=temp")
+    let response = await fetch("http://192.168.1.17:8090/patient_data?ID=1&reading=temp")
     let json = await response.json()
     let TempNum = json.temp
-    TempNum.forEach((item)=> setTemp_chart(item.split(",")))
-    setSwap(temp_chart)
+    // TempNum.forEach((item)=> setTemp_chart(item.split(",")))
+    setSwap(TempNum)
+    console.log(TempNum)
     console.log(temp_chart)
     // setTemp_chart(json.temp[0])
    
@@ -55,12 +56,13 @@ var label=[]
   }
   async function get_pateintpress()
   {
-    let response = await fetch("http://localhost:8090/patient_data?ID=1&reading=pressure")
+    let response = await fetch("http://192.168.1.17:8090/patient_data?ID=1&reading=pressure")
     let json = await response.json()
     let pressNum = json.pressure
-    let arrREs= pressNum.forEach((item)=> setPressure_chart( item.split(",")))
-    console.log(pressure_chart)
-    setSwap(pressure_chart)
+    // let arrREs= pressNum.forEach((item)=> setPressure_chart( item.split(",")))
+    // console.log(pressure_chart)
+    console.log(pressNum)
+    setSwap(pressNum)
     // let presNum= json.pressure[0]
 
     // console.log(json.pressure)
@@ -88,7 +90,7 @@ var label=[]
     console.log(pressure_chart)
     setShowPress((prev)=>!prev)
     setShowTemp((prev)=>!prev)
-    ToggleStatus('OFF','ON')
+    // ToggleStatus('ON','OFF')
     console.log(state)
     setTitle('Go to Temperature')
   }
@@ -100,7 +102,7 @@ var label=[]
     console.log(temp_chart)
     setShowTemp((prev)=>!prev)
     setShowPress((prev)=>!prev)
-    ToggleStatus('ON','OFF')
+    // ToggleStatus('OFF','ON')
     console.log(state)
     setTitle('Go to Pressure')
 
@@ -111,27 +113,28 @@ var label=[]
     // showStatus((prev)=>!prev)
 
 
-    if ((modetitle =='ON' && title =='Go to Pressure') || (modetitle =='OFF' && title =='Go to Temperature'))
-    {
-      // setmodeTitle("OFF")
-      ToggleStatus(['OFF','ON'])
-      console.log(state)
-      // let new_chart=[]
-      // for (let i=0;i<20;i++){
-      // new_chart.push(0)
-      // }
-      // setTemp_chart(new_chart)
-    }
-    else if (((modetitle =='OFF') && (title=='Go to Pressure')) || ((modetitle =='ON') && (title=='Go to Temperature')))
+
+   if (((modetitle =='ON') && (title=='Go to Pressure')) || ((modetitle =='OFF') && (title=='Go to Temperature')))
     { 
       // setmodeTitle("ON")   
-      ToggleStatus(['ON','OFF'])
+      ToggleStatus(["OFF","ON"])
       // let new_chart=[]
       // for (let i=0;i<20;i++){
       // new_chart.push(0)
       // }
       // setPressure_chart(new_chart)
       console.log(state)
+    }
+    else if ((modetitle =='OFF' && title =='Go to Pressure') || (modetitle =='ON' && title =='Go to Temperature'))
+    {
+      // setmodeTitle("OFF")
+      ToggleStatus(["ON","OFF"])
+      console.log(state)
+      // let new_chart=[]
+      // for (let i=0;i<20;i++){
+      // new_chart.push(0)
+      // }
+      // setTemp_chart(new_chart)
     }
     if(modetitle=='ON')
     {
@@ -161,17 +164,17 @@ var label=[]
       }
       
       setPressure_chart(new_chart)}
-    // let response =await fetch('http://localhost:8090/state', {
-    //   method: 'POST',
-    //   headers: {
-    //     Accept: 'application/json',
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify({
-    //     temp: state[0],
-    //     pressure:state[1]
-    //   })
-    // });    
+    let response =await fetch('http://192.168.1.17:8090/state', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        temp: state[0],
+        pressure:state[1]
+      })
+    });    
 
   }
   function switch_(){
